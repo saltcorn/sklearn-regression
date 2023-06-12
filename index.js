@@ -130,9 +130,42 @@ module.exports = {
             return [
               {
                 name: "regularization",
-                label: "Regularization paramerter",
+                label: "L2 Regularization parameter",
                 type: "Float",
                 attributes: { min: 0 },
+              },
+            ];
+          case "Lasso":
+            return [
+              {
+                name: "regularization",
+                label: "L1 Regularization parameter",
+                type: "Float",
+                attributes: { min: 0 },
+              },
+            ];
+          case "Support Vector Machine":
+            return [
+              {
+                name: "kernel",
+                label: "Kernel",
+                type: "String",
+                required: true,
+                attributes: { options: ["linear", "poly", "rbf", "sigmoid"] },
+              },
+              {
+                name: "C",
+                label: "C",
+                sublabel: "Regularization parameter",
+                type: "Float",
+                attributes: { min: 0 },
+                default: 1.0,
+              },
+              {
+                name: "degree",
+                label: "Degree",
+                type: "Integer",
+                showIf: { kernel: "poly" },
               },
             ];
           default:
