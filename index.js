@@ -17,15 +17,12 @@ const {
 const {
   get_predictor,
   write_csv,
-  shorten_trackback,
+  run_jupyter_model,
 } = require("@saltcorn/data/model-helper");
 
 const pythonBridge = require("python-bridge");
 
 //https://stackoverflow.com/a/56095793/19839414
-const util = require("util");
-const { config } = require("process");
-const exec = util.promisify(require("child_process").exec);
 
 let python = pythonBridge({
   python: "python3",
@@ -167,38 +164,12 @@ module.exports = {
           fields,
           "/tmp/scdata.csv"
         );
-        try {
-          //run notebook
-          await exec(
-            `jupyter nbconvert --to html --ClearOutputPreprocessor.enabled=True --embed-images ${__dirname}/Regression.ipynb --execute --output /tmp/scmodelreport.html`,
-            {
-              cwd: "/tmp",
-              env: {
-                ...process.env,
-                SC_MODEL_CFG: JSON.stringify(configuration),
-                SC_MODEL_HYPERPARAMS: JSON.stringify(hyperparameters),
-                SC_MODEL_DATA_FILE: "/tmp/scdata.csv",
-                SC_MODEL_FIT_DEST: "/tmp/scanomallymodel",
-                SC_MODEL_METRICS_DEST: "/tmp/scmodelmetrics.json",
-              },
-            }
-          );
-        } catch (e) {
-          return {
-            error: shorten_trackback(e.message),
-          };
-        }
-        //pick up
-        const fit_object = await fsp.readFile("/tmp/scanomallymodel");
-        const report = await fsp.readFile("/tmp/scmodelreport.html");
-        const metric_values = JSON.parse(
-          await fsp.readFile("/tmp/scmodelmetrics.json")
-        );
-        return {
-          fit_object,
-          report,
-          metric_values,
-        };
+        return await run_jupyter_model({
+          configuration,
+          hyperparameters,
+          csvPath: "/tmp/scdata.csv",
+          ipynbPath: path.join(__dirname, "Regression.ipynb"),
+        });
       },
       predict: async ({
         id, //instance id
