@@ -101,6 +101,7 @@ const configuration_workflow = (req) =>
                 name: "regression_model",
                 label: "Regression model",
                 type: "String",
+                required: true,
                 attributes: {
                   options: [
                     "Linear",
@@ -122,7 +123,7 @@ let regr_pred_code = get_predictor(path.join(__dirname, "Regression.ipynb"));
 
 module.exports = {
   sc_plugin_api_version: 1,
-  plugin_name: "anomaly-gmm",
+  plugin_name: "sklearn-regression",
   modeltemplates: {
     RegressionModel: {
       configuration_workflow,
@@ -169,7 +170,7 @@ module.exports = {
         try {
           //run notebook
           await exec(
-            `jupyter nbconvert --to html --ClearOutputPreprocessor.enabled=True --embed-images ${__dirname}/GMM.ipynb --execute --output /tmp/scmodelreport.html`,
+            `jupyter nbconvert --to html --ClearOutputPreprocessor.enabled=True --embed-images ${__dirname}/Regression.ipynb --execute --output /tmp/scmodelreport.html`,
             {
               cwd: "/tmp",
               env: {
