@@ -140,7 +140,11 @@ module.exports = {
         }
       },
       metrics: { R2: { lowerIsBetter: true } },
-      prediction_outputs: [{ name: "yhat", type: "Float" }],
+      prediction_outputs: ({ table, configuration }) => {
+        return [
+          { name: `${configuration.outcome_field}_prediction`, type: "Float" },
+        ];
+      },
       train: async ({ table, configuration, hyperparameters, state }) => {
         const { columns, outcome_field } = configuration;
         //write data to CSV
@@ -174,7 +178,7 @@ module.exports = {
       predict: async ({
         id, //instance id
         model: {
-          configuration: { columns },
+          configuration: { columns, outcome_field },
           table_id,
         },
         hyperparameters,
@@ -189,7 +193,7 @@ module.exports = {
         const predicts =
           await python`predict('/tmp/scanomallymodel'+str(${id}), ${`/tmp/scdata${rnd}.csv`})`;
         return rows.map((r, ix) => ({
-          yhat: predicts.yhat[ix],
+          [`${outcome_field}_prediction`]: predicts.yhat[ix],
         }));
       },
     },
