@@ -121,7 +121,7 @@ let regr_pred_code = get_predictor(path.join(__dirname, "Regression.ipynb"));
 module.exports = {
   sc_plugin_api_version: 1,
   plugin_name: "sklearn-regression",
-  modeltemplates: {
+  modelpatterns: {
     RegressionModel: {
       configuration_workflow,
       hyperparameter_fields: ({ table, configuration }) => {
