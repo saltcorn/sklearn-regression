@@ -28,11 +28,11 @@ all the way down to the bottom of the table settings page and there will be a
 section for models, where are you can add a new model. To configure and run
 a new predictive model you need to create two types of entities:
 
-    * You need to first create a *model*, which specifies the predictors and
-      the outcome variables, and also the class of regression model (Linear,
-      Lasso etc) you would like to use.
-    * Then for each model you need to define at least one model instance. The
-      model instance will set particular values for the hyperparameters, if any.
+- You need to first create a _model_, which specifies the predictors and
+  the outcome variables, and also the class of regression model (Linear,
+  Lasso etc) you would like to use.
+- Then for each model you need to define at least one _model instance_. The
+  model instance will set particular values for the hyperparameters, if any.
 
 When you create a model instance it will be trained on all the data in the table.
 It will give values for an accuracy score which can be compared across different
