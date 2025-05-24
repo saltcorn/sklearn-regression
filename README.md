@@ -8,7 +8,7 @@ This requires Python 3.x to be available as `python3` in your environment. In
 addition, install the following modules with `pip`:
 
 ```
-pip install pandas scikit-learn nbconvert
+pip install pandas scikit-learn nbconvert jupyter
 ```
 
 You may also need Pandoc installed, on Debian/Ubuntu run:
