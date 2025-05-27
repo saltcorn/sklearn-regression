@@ -3,7 +3,10 @@ const Table = require("@saltcorn/data/models/table");
 const Form = require("@saltcorn/data/models/form");
 const Workflow = require("@saltcorn/data/models/workflow");
 const FieldRepeat = require("@saltcorn/data/models/fieldrepeat");
-const { eval_expression } = require("@saltcorn/data/models/expression");
+const {
+  eval_expression,
+  jsexprToWhere,
+} = require("@saltcorn/data/models/expression");
 const fs = require("fs");
 const fsp = fs.promises;
 const path = require("path");
@@ -19,6 +22,7 @@ const {
   write_csv,
   run_jupyter_model,
 } = require("@saltcorn/data/model-helper");
+const { mergeIntoWhere } = require("@saltcorn/data/utils");
 
 const pythonBridge = require("python-bridge");
 
@@ -95,6 +99,30 @@ const configuration_workflow = (req) =>
                 },
               },
               {
+                name: "include_fml",
+                label: req.__("Row inclusion formula"),
+                class: "validate-expression",
+                sublabel:
+                  req.__("Only include rows where this formula is true. ") +
+                  req.__("In scope:") +
+                  " " +
+                  [
+                    ...table.fields.map((f) => f.name),
+                    "user",
+                    "year",
+                    "month",
+                    "day",
+                    "today()",
+                  ]
+                    .map((s) => `<code>${s}</code>`)
+                    .join(", "),
+                type: "String",
+                help: {
+                  topic: "Inclusion Formula",
+                  context: { table_name: table.name },
+                },
+              },
+              {
                 name: "regression_model",
                 label: "Regression model",
                 type: "String",
@@ -106,7 +134,7 @@ const configuration_workflow = (req) =>
                     "Lasso",
                     "Random Forest",
                     "Support Vector Machine",
-                    "Partial Least Squares"
+                    "Partial Least Squares",
                   ],
                 },
               },
@@ -145,7 +173,7 @@ module.exports = {
                 attributes: { min: 0 },
               },
             ];
-            case "Partial Least Squares":
+          case "Partial Least Squares":
             return [
               {
                 name: "components",
@@ -199,6 +227,10 @@ module.exports = {
           fields
         );
         const where = await stateFieldsToWhere({ fields, state, table });
+        if (configuration.include_fml) {
+          let where1 = jsexprToWhere(configuration.include_fml, {}, fields);
+          mergeIntoWhere(where, where1 || {});
+        }
         //console.log("getting rows");
         //{ and: [{ not: { id: null } }, { not: { x: null } }] }
         //console.log(columns);
@@ -206,7 +238,7 @@ module.exports = {
         where.and = columns
           .filter((c) => c.type === "Field")
           .map((c) => ({ not: { [c.field_name]: null } }));
-        //console.log("where", JSON.stringify(where, null,2));
+        console.log("where", JSON.stringify(where, null,2));
 
         //throw new Error("jkopi");
         let rows = await table.getJoinedRows({
