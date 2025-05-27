@@ -106,6 +106,7 @@ const configuration_workflow = (req) =>
                     "Lasso",
                     "Random Forest",
                     "Support Vector Machine",
+                    "Partial Least Squares"
                   ],
                 },
               },
@@ -142,6 +143,15 @@ module.exports = {
                 label: "L1 Regularization parameter",
                 type: "Float",
                 attributes: { min: 0 },
+              },
+            ];
+            case "Partial Least Squares":
+            return [
+              {
+                name: "components",
+                label: "Number of components to keep",
+                type: "Integer",
+                attributes: { min: 1 },
               },
             ];
           case "Support Vector Machine":
@@ -189,11 +199,22 @@ module.exports = {
           fields
         );
         const where = await stateFieldsToWhere({ fields, state, table });
+        //console.log("getting rows");
+        //{ and: [{ not: { id: null } }, { not: { x: null } }] }
+        //console.log(columns);
+
+        where.and = columns
+          .filter((c) => c.type === "Field")
+          .map((c) => ({ not: { [c.field_name]: null } }));
+        //console.log("where", JSON.stringify(where, null,2));
+
+        //throw new Error("jkopi");
         let rows = await table.getJoinedRows({
           where,
           joinFields,
           aggregations,
         });
+        console.log("writing csv");
 
         await write_csv(
           rows,
@@ -201,6 +222,8 @@ module.exports = {
           fields,
           "/tmp/scdata.csv"
         );
+        console.log("running model");
+
         return await run_jupyter_model({
           configuration,
           hyperparameters,
