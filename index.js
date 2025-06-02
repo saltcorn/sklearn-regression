@@ -138,6 +138,12 @@ const configuration_workflow = (req) =>
                   ],
                 },
               },
+              {
+                name: "split_test_train",
+                label: "Split dataset",
+                sublabel: "Split into training and testing datasets.",
+                type: "Bool",
+              },
             ],
           });
         },
@@ -238,7 +244,7 @@ module.exports = {
         where.and = columns
           .filter((c) => c.type === "Field")
           .map((c) => ({ not: { [c.field_name]: null } }));
-        console.log("where", JSON.stringify(where, null,2));
+        console.log("where", JSON.stringify(where, null, 2));
 
         //throw new Error("jkopi");
         let rows = await table.getJoinedRows({
