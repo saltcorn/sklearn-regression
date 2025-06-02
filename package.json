@@ -1,6 +1,6 @@
 {
   "name": "@saltcorn/sklearn-regression",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Regression models for Saltcorn",
   "main": "index.js",
   "dependencies": {
