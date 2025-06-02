@@ -188,6 +188,21 @@ module.exports = {
                 attributes: { min: 1 },
               },
             ];
+          case "Random Forest":
+            return [
+              {
+                name: "pca",
+                label: "PCA preprocess",
+                type: "Bool",
+              },
+              {
+                name: "components",
+                label: "Number of components to keep",
+                type: "Integer",
+                attributes: { min: 1 },
+                showIf: { pca: true },
+              },
+            ];
           case "Support Vector Machine":
             return [
               {
