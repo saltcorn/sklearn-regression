@@ -23,6 +23,18 @@ const {
   run_jupyter_model,
 } = require("@saltcorn/data/model-helper");
 const { mergeIntoWhere } = require("@saltcorn/data/utils");
+const {
+  text,
+  div,
+  pre,
+  code,
+  h5,
+  table,
+  tr,
+  td,
+  th,
+  tbody,
+} = require("@saltcorn/markup/tags");
 
 const pythonBridge = require("python-bridge");
 
@@ -151,7 +163,7 @@ const configuration_workflow = (req) =>
                 type: "String",
                 fieldview: "textarea",
                 required: true,
-                sublabel: "Assign model to <code>model</code> variable.", 
+                sublabel: "Assign model to <code>model</code> variable.",
                 showIf: { regression_model: "Custom Python Code" },
               },
             ],
@@ -247,6 +259,48 @@ module.exports = {
           { name: `${configuration.outcome_field}_prediction`, type: "Float" },
         ];
       },
+      renderModel: ({ configuration }) =>
+        table(
+          tbody(
+            tr(
+              th({ class: "pe-2" }, "Model"),
+              td(configuration.regression_model)
+            ),
+            tr(
+              th({ class: "pe-2" }, "Predictors"),
+              td(
+                configuration.columns
+                  .map(
+                    (c) =>
+                      c.field_name ||
+                      c.join_field ||
+                      c.agg_relation ||
+                      c.formula
+                  )
+                  .join(", ")
+              )
+            ),
+            tr(
+              th({ class: "pe-2" }, "Outcome field"),
+              td(configuration.outcome_field)
+            ),
+            configuration.include_fml &&
+              tr(
+                th({ class: "pe-2" }, "Row inclusion formula"),
+                td(configuration.include_fml)
+              ),
+            tr(
+              th({ class: "pe-2" }, "Split dataset"),
+              td((!!configuration.split_test_train).toString())
+            ),
+            configuration.regression_model === "Custom Python Code" &&
+              tr(
+                th({ class: "align-top pe-2" }, "Model code"),
+                td({ class: "align-top" }, pre(code(configuration.model_code)))
+              )
+          )
+        ),
+
       train: async ({ table, configuration, hyperparameters, state }) => {
         const { columns, outcome_field } = configuration;
         //write data to CSV
