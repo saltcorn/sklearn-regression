@@ -165,6 +165,7 @@ const configuration_workflow = (req) =>
                 required: true,
                 sublabel: "Assign model to <code>model</code> variable.",
                 showIf: { regression_model: "Custom Python Code" },
+                attributes: { spellcheck: false, monospace: true },
               },
             ],
           });
