@@ -183,7 +183,7 @@ module.exports = {
     RegressionModel: {
       configuration_workflow,
       hyperparameter_fields: ({ table, configuration }) => {
-        switch (configuration.regression_model) {
+        switch (configuration?.regression_model) {
           case "Ridge":
             return [
               {
